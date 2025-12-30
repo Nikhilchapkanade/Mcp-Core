@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-agent
+spec:
+  selector:
+    app: rag-agent
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-agent
+  template:
+    metadata:
+      labels:
+        app: rag-agent
+    spec:
+      containers:
+      - name: agent
+        image: my-registry/rag-agent:latest
+        imagePullPolicy: Never
+        env:
+        - name: MCP_SERVER_URL
+          value: "http://mcp-knowledge/sse" # K8s Service Discovery DNS
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-secret
+              key: api-key

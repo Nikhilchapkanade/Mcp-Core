@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-knowledge
+spec:
+  selector:
+    app: mcp-knowledge
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-knowledge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-knowledge
+  template:
+    metadata:
+      labels:
+        app: mcp-knowledge
+    spec:
+      containers:
+      - name: server
+        # Replace with your actual build image registry
+        image: my-registry/mcp-knowledge:latest 
+        imagePullPolicy: Never # If using local Kind/Minikube
+        ports:
+        - containerPort: 8000
